@@ -49,3 +49,48 @@ func TestToMaps_NilBatch(t *testing.T) {
 		t.Fatal("expected error for nil")
 	}
 }
+
+// TestToMaps_StringRows (CSV batch). CSV sources emit [][]string where the
+// first row is the header (column names) and subsequent rows are values.
+// ToMaps must turn this into []map[string]any keyed by the header names, so
+// processors (filter/redact/etc.) can address fields by name.
+func TestToMaps_StringRows(t *testing.T) {
+	in := [][]string{
+		{"name", "ssn", "city"}, // header
+		{"alice", "123", "NYC"},
+		{"bob", "987", "LA"},
+	}
+	out, err := ToMaps(in)
+	if err != nil {
+		t.Fatalf("[][]string: %v", err)
+	}
+	if len(out) != 2 {
+		t.Fatalf("expected 2 data rows (header consumed), got %d", len(out))
+	}
+	if out[0]["name"] != "alice" || out[0]["ssn"] != "123" || out[0]["city"] != "NYC" {
+		t.Errorf("row 0 = %v, want alice/123/NYC keyed by header", out[0])
+	}
+	if out[1]["name"] != "bob" {
+		t.Errorf("row 1 name = %v, want bob", out[1]["name"])
+	}
+}
+
+// A single-row [][]string with just a header and no data → empty result.
+func TestToMaps_StringRows_HeaderOnly(t *testing.T) {
+	in := [][]string{{"a", "b"}}
+	out, err := ToMaps(in)
+	if err != nil {
+		t.Fatalf("header-only: %v", err)
+	}
+	if len(out) != 0 {
+		t.Fatalf("expected 0 data rows, got %d", len(out))
+	}
+}
+
+// An empty [][]string → empty result, no error.
+func TestToMaps_StringRows_Empty(t *testing.T) {
+	out, err := ToMaps([][]string{})
+	if err != nil || len(out) != 0 {
+		t.Fatalf("empty: out=%v err=%v, want empty/no-error", out, err)
+	}
+}

@@ -5,11 +5,6 @@ import (
 	"github.com/planx-lab/planx-sdk-go/sdk"
 )
 
-func init() {
-	sdk.RegisterType([]map[string]any{})
-	sdk.RegisterType(map[string]any{})
-}
-
 func main() {
 	sdk.Serve(sdk.Plugin{
 		ID:          "processors",
