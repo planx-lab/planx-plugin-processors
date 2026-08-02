@@ -44,7 +44,7 @@ func (r *JSONRedact) Init(_ context.Context, cfg []byte) error {
 }
 
 func (r *JSONRedact) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := ToMaps(b)
+	rows, err := sdk.ToRows(b)
 	if err != nil {
 		return nil, fmt.Errorf("json-redact: %w", err)
 	}

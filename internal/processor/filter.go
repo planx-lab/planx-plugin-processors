@@ -37,18 +37,15 @@ func (f *Filter) Init(_ context.Context, cfg []byte) error {
 }
 
 func (f *Filter) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := ToMaps(b)
+	rows, err := sdk.ToRows(b)
 	if err != nil {
 		return nil, fmt.Errorf("filter: %w", err)
 	}
-	var result []map[string]any
+	result := make(sdk.Rows, 0, len(rows))
 	for _, row := range rows {
 		if f.matches(row) {
 			result = append(result, row)
 		}
-	}
-	if result == nil {
-		result = []map[string]any{}
 	}
 	return result, nil
 }

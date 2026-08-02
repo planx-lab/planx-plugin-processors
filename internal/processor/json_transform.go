@@ -42,7 +42,7 @@ func (t *JSONTransform) Init(_ context.Context, cfg []byte) error {
 }
 
 func (t *JSONTransform) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := ToMaps(b)
+	rows, err := sdk.ToRows(b)
 	if err != nil {
 		return nil, fmt.Errorf("json-transform: %w", err)
 	}

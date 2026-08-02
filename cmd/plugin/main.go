@@ -92,8 +92,11 @@ func main() {
 				Processor:   processor.NewTextTemplate,
 				ConfigSchema: sdk.Schema(
 					sdk.StringField("template", sdk.Required(),
-						sdk.WithDescription("Go text/template rendered per row (dot = row map); output is []string"),
+						sdk.WithDescription("Go text/template rendered per row (dot = row map); result written into each row"),
 						sdk.WithExample("{{.name}}")),
+					sdk.StringField("field",
+						sdk.WithDefault(sdk.StringValue("_text")),
+						sdk.WithDescription("Field name to write the rendered result into (default \"_text\")")),
 				),
 			},
 		},
