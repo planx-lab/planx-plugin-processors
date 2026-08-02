@@ -1,4 +1,4 @@
-package filter
+package processor
 
 import (
 	"context"
@@ -7,21 +7,21 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/planx-lab/planx-plugin-processors/internal/batch"
 	"github.com/planx-lab/planx-sdk-go/sdk"
 )
 
-type Config struct {
+type FilterConfig struct {
 	Field    string `json:"field"`
 	Operator string `json:"operator"`
 	Value    string `json:"value"`
 }
 
 type Filter struct {
-	cfg Config
+	cfg FilterConfig
 }
 
-func New() sdk.ProcessorSPI { return &Filter{} }
+// NewFilter builds the filter processor.
+func NewFilter() sdk.ProcessorSPI { return &Filter{} }
 
 func (f *Filter) Init(_ context.Context, cfg []byte) error {
 	if err := json.Unmarshal(cfg, &f.cfg); err != nil {
@@ -37,7 +37,7 @@ func (f *Filter) Init(_ context.Context, cfg []byte) error {
 }
 
 func (f *Filter) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := batch.ToMaps(b)
+	rows, err := ToMaps(b)
 	if err != nil {
 		return nil, fmt.Errorf("filter: %w", err)
 	}

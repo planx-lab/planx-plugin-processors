@@ -1,4 +1,4 @@
-package filter
+package processor
 
 import (
 	"context"

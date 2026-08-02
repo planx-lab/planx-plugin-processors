@@ -11,7 +11,7 @@ MUST comply with:
 
 ## ALLOWED DIRECTORIES (Connector pattern)
 cmd/plugin/
-internal/{batch,filter,fieldmapper,jsontransform,regexreplace}/
+internal/{processor}/
 go.mod
 
 ## FORBIDDEN

@@ -1,4 +1,4 @@
-package jsontransform
+package processor
 
 import (
 	"context"
@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/planx-lab/planx-plugin-processors/internal/batch"
 	"github.com/planx-lab/planx-sdk-go/sdk"
 )
 
-type Config struct {
+type JSONTransformConfig struct {
 	Operations string `json:"operations"`
 }
 
@@ -25,10 +24,11 @@ type JSONTransform struct {
 	ops []Operation
 }
 
-func New() sdk.ProcessorSPI { return &JSONTransform{} }
+// NewJSONTransform builds the json-transform processor.
+func NewJSONTransform() sdk.ProcessorSPI { return &JSONTransform{} }
 
 func (t *JSONTransform) Init(_ context.Context, cfg []byte) error {
-	var c Config
+	var c JSONTransformConfig
 	if err := json.Unmarshal(cfg, &c); err != nil {
 		return fmt.Errorf("json-transform: config: %w", err)
 	}
@@ -42,7 +42,7 @@ func (t *JSONTransform) Init(_ context.Context, cfg []byte) error {
 }
 
 func (t *JSONTransform) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := batch.ToMaps(b)
+	rows, err := ToMaps(b)
 	if err != nil {
 		return nil, fmt.Errorf("json-transform: %w", err)
 	}

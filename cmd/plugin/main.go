@@ -1,10 +1,7 @@
 package main
 
 import (
-	"github.com/planx-lab/planx-plugin-processors/internal/fieldmapper"
-	"github.com/planx-lab/planx-plugin-processors/internal/filter"
-	"github.com/planx-lab/planx-plugin-processors/internal/jsontransform"
-	"github.com/planx-lab/planx-plugin-processors/internal/regexreplace"
+	"github.com/planx-lab/planx-plugin-processors/internal/processor"
 	"github.com/planx-lab/planx-sdk-go/sdk"
 )
 
@@ -18,13 +15,19 @@ func main() {
 		ID:          "processors",
 		Version:     "1.0.0",
 		DisplayName: "Processors",
-		Description: "Common ETL processors: filter, field-mapper, json-transform, regex-replace.",
+		Description: "Common ETL processors: passthrough, filter, field-mapper, json-transform, json-validate, json-redact, regex-replace, text-template.",
 		Components: []sdk.ComponentSpec{
 			{
-				ID:   "filter",
-				Kind: sdk.KindProcessor,
+				ID:          "passthrough",
+				Kind:        sdk.KindProcessor,
+				DisplayName: "Passthrough",
+				Processor:   processor.NewPassthrough,
+			},
+			{
+				ID:          "filter",
+				Kind:        sdk.KindProcessor,
 				DisplayName: "Filter",
-				Processor:   filter.New,
+				Processor:   processor.NewFilter,
 				ConfigSchema: sdk.Schema(
 					sdk.StringField("field", sdk.Required(), sdk.WithDescription("Field name to filter on")),
 					sdk.EnumField("operator", []string{"eq", "ne", "gt", "lt", "ge", "le", "contains"},
@@ -33,10 +36,10 @@ func main() {
 				),
 			},
 			{
-				ID:   "field-mapper",
-				Kind: sdk.KindProcessor,
+				ID:          "field-mapper",
+				Kind:        sdk.KindProcessor,
 				DisplayName: "Field Mapper",
-				Processor:   fieldmapper.New,
+				Processor:   processor.NewFieldMapper,
 				ConfigSchema: sdk.Schema(
 					sdk.StringField("mappings", sdk.Required(),
 						sdk.WithDescription(`JSON: [{"from":"old","to":"new","action":"rename"}]`),
@@ -44,10 +47,10 @@ func main() {
 				),
 			},
 			{
-				ID:   "json-transform",
-				Kind: sdk.KindProcessor,
+				ID:          "json-transform",
+				Kind:        sdk.KindProcessor,
 				DisplayName: "JSON Transform",
-				Processor:   jsontransform.New,
+				Processor:   processor.NewJSONTransform,
 				ConfigSchema: sdk.Schema(
 					sdk.StringField("operations", sdk.Required(),
 						sdk.WithDescription(`JSON: [{"op":"extract","path":"data.name","to":"name"}]`),
@@ -55,14 +58,47 @@ func main() {
 				),
 			},
 			{
-				ID:   "regex-replace",
-				Kind: sdk.KindProcessor,
+				ID:          "json-validate",
+				Kind:        sdk.KindProcessor,
+				DisplayName: "JSON Validate",
+				Processor:   processor.NewJSONValidate,
+				ConfigSchema: sdk.Schema(
+					sdk.StringField("required_fields", sdk.Required(),
+						sdk.WithDescription(`JSON array of field names every row must carry; fail-fast on any missing field`),
+						sdk.WithExample(`["id","name"]`)),
+				),
+			},
+			{
+				ID:          "json-redact",
+				Kind:        sdk.KindProcessor,
+				DisplayName: "JSON Redact",
+				Processor:   processor.NewJSONRedact,
+				ConfigSchema: sdk.Schema(
+					sdk.StringField("fields", sdk.Required(),
+						sdk.WithDescription(`JSON array of field names to overwrite with "***"`),
+						sdk.WithExample(`["ssn","email"]`)),
+				),
+			},
+			{
+				ID:          "regex-replace",
+				Kind:        sdk.KindProcessor,
 				DisplayName: "Regex Replace",
-				Processor:   regexreplace.New,
+				Processor:   processor.NewRegexReplace,
 				ConfigSchema: sdk.Schema(
 					sdk.StringField("field", sdk.Required()),
 					sdk.StringField("pattern", sdk.Required(), sdk.WithDescription("Go regexp (RE2 syntax)")),
 					sdk.StringField("replacement", sdk.Required(), sdk.WithDescription("Replacement (${1} for capture groups)")),
+				),
+			},
+			{
+				ID:          "text-template",
+				Kind:        sdk.KindProcessor,
+				DisplayName: "Text Template",
+				Processor:   processor.NewTextTemplate,
+				ConfigSchema: sdk.Schema(
+					sdk.StringField("template", sdk.Required(),
+						sdk.WithDescription("Go text/template rendered per row (dot = row map); output is []string"),
+						sdk.WithExample("{{.name}}")),
 				),
 			},
 		},

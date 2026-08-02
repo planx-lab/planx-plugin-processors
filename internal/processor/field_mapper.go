@@ -1,15 +1,14 @@
-package fieldmapper
+package processor
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 
-	"github.com/planx-lab/planx-plugin-processors/internal/batch"
 	"github.com/planx-lab/planx-sdk-go/sdk"
 )
 
-type Config struct {
+type FieldMapperConfig struct {
 	Mappings string `json:"mappings"`
 }
 
@@ -24,10 +23,11 @@ type FieldMapper struct {
 	mappings []Mapping
 }
 
-func New() sdk.ProcessorSPI { return &FieldMapper{} }
+// NewFieldMapper builds the field-mapper processor.
+func NewFieldMapper() sdk.ProcessorSPI { return &FieldMapper{} }
 
 func (m *FieldMapper) Init(_ context.Context, cfg []byte) error {
-	var c Config
+	var c FieldMapperConfig
 	if err := json.Unmarshal(cfg, &c); err != nil {
 		return fmt.Errorf("field-mapper: config: %w", err)
 	}
@@ -41,7 +41,7 @@ func (m *FieldMapper) Init(_ context.Context, cfg []byte) error {
 }
 
 func (m *FieldMapper) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := batch.ToMaps(b)
+	rows, err := ToMaps(b)
 	if err != nil {
 		return nil, fmt.Errorf("field-mapper: %w", err)
 	}

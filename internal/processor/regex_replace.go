@@ -1,4 +1,4 @@
-package regexreplace
+package processor
 
 import (
 	"context"
@@ -6,22 +6,22 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/planx-lab/planx-plugin-processors/internal/batch"
 	"github.com/planx-lab/planx-sdk-go/sdk"
 )
 
-type Config struct {
+type RegexReplaceConfig struct {
 	Field       string `json:"field"`
 	Pattern     string `json:"pattern"`
 	Replacement string `json:"replacement"`
 }
 
 type RegexReplace struct {
-	cfg Config
+	cfg RegexReplaceConfig
 	re  *regexp.Regexp
 }
 
-func New() sdk.ProcessorSPI { return &RegexReplace{} }
+// NewRegexReplace builds the regex-replace processor.
+func NewRegexReplace() sdk.ProcessorSPI { return &RegexReplace{} }
 
 func (r *RegexReplace) Init(_ context.Context, cfg []byte) error {
 	if err := json.Unmarshal(cfg, &r.cfg); err != nil {
@@ -42,7 +42,7 @@ func (r *RegexReplace) Init(_ context.Context, cfg []byte) error {
 }
 
 func (r *RegexReplace) Process(b sdk.Batch) (sdk.Batch, error) {
-	rows, err := batch.ToMaps(b)
+	rows, err := ToMaps(b)
 	if err != nil {
 		return nil, fmt.Errorf("regex-replace: %w", err)
 	}

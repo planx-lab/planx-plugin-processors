@@ -1,4 +1,4 @@
-package regexreplace
+package processor
 
 import (
 	"context"
@@ -55,7 +55,7 @@ func TestNonStringField(t *testing.T) {
 	}
 }
 
-func TestMissingField(t *testing.T) {
+func TestRegexReplace_MissingField(t *testing.T) {
 	r := newReplacer(t, `{"field":"nonexistent","pattern":"x","replacement":"y"}`)
 	in := []map[string]any{{"other": "value"}}
 	out, err := r.Process(in)
@@ -93,6 +93,6 @@ func TestMultipleRows(t *testing.T) {
 	}
 }
 
-func TestSPIConformance(t *testing.T) {
+func TestRegexReplace_SPIConformance(t *testing.T) {
 	var _ sdk.ProcessorSPI = (*RegexReplace)(nil)
 }

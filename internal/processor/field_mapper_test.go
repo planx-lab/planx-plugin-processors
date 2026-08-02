@@ -1,4 +1,4 @@
-package fieldmapper
+package processor
 
 import (
 	"context"
@@ -105,6 +105,6 @@ func TestMissingSourceKey(t *testing.T) {
 	}
 }
 
-func TestSPIConformance(t *testing.T) {
+func TestFieldMapper_SPIConformance(t *testing.T) {
 	var _ sdk.ProcessorSPI = (*FieldMapper)(nil)
 }

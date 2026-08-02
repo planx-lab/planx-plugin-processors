@@ -1,4 +1,4 @@
-package jsontransform
+package processor
 
 import (
 	"context"
@@ -113,6 +113,6 @@ func TestMultipleOps(t *testing.T) {
 	}
 }
 
-func TestSPIConformance(t *testing.T) {
+func TestJSONTransform_SPIConformance(t *testing.T) {
 	var _ sdk.ProcessorSPI = (*JSONTransform)(nil)
 }
